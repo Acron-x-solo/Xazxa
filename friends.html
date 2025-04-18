@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Заявки в друзья</h5>
+                </div>
+                <div class="card-body">
+                    {% if friend_requests %}
+                        {% for request in friend_requests %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <strong>{{ request.user.username }}</strong>
+                                    <small class="text-muted">отправлено {{ request.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-success btn-sm" onclick="acceptFriend({{ request.id }})">Принять</button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectFriend({{ request.id }})">Отклонить</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Нет новых заявок в друзья</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Мои друзья</h5>
+                </div>
+                <div class="card-body">
+                    {% if friends %}
+                        {% for friendship in friends %}
+                            {% set friend = friendship.user if friendship.user_id != current_user.id else friendship.friend %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <strong>{{ friend.username }}</strong>
+                                    <small class="text-muted">друзья с {{ friendship.created_at.strftime('%d.%m.%Y') }}</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('chat', user_id=friend.id) }}" class="btn btn-primary btn-sm">Написать</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">У вас пока нет друзей</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function acceptFriend(requestId) {
+            fetch(`/api/friends/${requestId}/accept`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            });
+        }
+
+        function rejectFriend(requestId) {
+            fetch(`/api/friends/${requestId}/reject`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            });
+        }
+    </script>
+{% endblock %} 

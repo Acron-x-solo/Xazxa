@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Поиск пользователей..." value="{{ search }}">
+                            <button class="btn btn-primary" type="submit">Поиск</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Пользователи</h5>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                        {% for user in users %}
+                            {% if user.id != current_user.id %}
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.bio %}
+                                            <p class="mb-0 text-muted small">{{ user.bio }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('user_profile', user_id=user.id) }}" class="btn btn-primary btn-sm">Профиль</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Пользователи не найдены</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 
